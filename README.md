@@ -72,4 +72,4 @@ CopyKeeper (复制宝) 是一个Chrome浏览器扩展，用于自动记录用户
 
 ## 许可证
 
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.md) 
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) 
