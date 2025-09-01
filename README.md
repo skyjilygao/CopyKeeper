@@ -1,0 +1,99 @@
+# CopyKeeper (复制宝)
+
+## 简介
+
+CopyKeeper (复制宝) 是一个Chrome浏览器扩展，用于自动记录用户在网页上复制的文本内容。它可以帮助用户保存重要的文本片段，方便日后查阅和使用。
+
+## 功能特点
+
+- **自动记录**：当用户复制网页上的文本时，自动保存文本内容
+- **来源追踪**：记录文本的来源网页URL
+- **时间戳**：记录文本复制的具体时间
+- **重复过滤**：自动过滤重复的内容，避免冗余记录
+- **记录管理**：支持设置最大记录数量，自动清理旧记录
+- **一键清空**：提供一键清空所有记录的功能
+
+## 安装方法
+
+### 从Chrome网上应用店安装
+
+1. 访问Chrome网上应用店（即将上线）
+2. 搜索"CopyKeeper"或"复制宝"
+3. 点击"添加至Chrome"按钮
+
+### 开发者模式安装
+
+1. 下载本仓库代码
+2. 打开Chrome浏览器，进入扩展程序页面 (chrome://extensions/)
+3. 开启右上角的"开发者模式"
+4. 点击"加载已解压的扩展程序"
+5. 选择本仓库的文件夹
+
+## 使用方法
+
+1. 安装扩展后，在浏览网页时复制任何文本
+2. 文本会自动保存到扩展中
+3. 点击浏览器工具栏中的扩展图标，查看已保存的文本
+4. 在弹出窗口中可以：
+   - 查看所有保存的文本及其来源和时间
+   - 设置最大记录数量
+   - 清空所有记录
+
+## 隐私说明
+
+- 本扩展仅在本地保存数据，不会将您的数据上传到任何服务器
+- 所有数据存储在浏览器的本地存储中，只有您能访问
+- 扩展仅请求必要的权限（storage）来实现其功能
+
+## 开发
+
+### 项目结构
+
+- `manifest.json`: 扩展配置文件
+- `content.js`: 内容脚本，监听复制事件并发送消息
+- `background.js`: 后台脚本，处理消息并管理存储
+- `popup.html`: 弹出窗口的HTML结构
+- `popup.js`: 弹出窗口的交互逻辑
+- `images/`: 扩展图标
+
+### 技术栈
+
+- JavaScript
+- Chrome Extension API
+- HTML/CSS
+
+## 贡献指南
+
+欢迎对本项目进行贡献！您可以通过以下方式参与：
+
+1. 提交Bug报告
+2. 提出新功能建议
+3. 提交代码改进
+
+## 许可证
+
+本项目采用 [MIT 许可证](https://opensource.org/licenses/MIT) 进行许可。
+
+```
+MIT License
+
+Copyright (c) 2025 CopyKeeper
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
