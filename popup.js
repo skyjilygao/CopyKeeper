@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
   const selectedTextsContainer = document.getElementById('selected-texts-container');
   const clearBtn = document.getElementById('clear-btn');
   const maxRecordsInput = document.getElementById('max-records');
+  const totalCountElement = document.getElementById('total-count');
+  const searchInput = document.getElementById('search-input');
+  const searchCountElement = document.getElementById('search-count');
+  
+  let allTexts = [];
+  let filteredTexts = [];
   
   // 从存储中获取设置和已保存的文本
   try {
@@ -29,11 +35,17 @@ document.addEventListener('DOMContentLoaded', function() {
       const selectedTexts = result.selectedTexts || [];
       const maxRecords = result.maxRecords || 50;
       
+      allTexts = selectedTexts;
+      filteredTexts = selectedTexts;
+      
       // 设置保存条数输入框的值
       maxRecordsInput.value = maxRecords;
       
+      // 更新总条数显示
+      updateTotalCount(allTexts.length);
+      
       // 显示文本记录
-      displayTexts(selectedTexts);
+      displayTexts(filteredTexts);
     });
   } catch (error) {
     console.error('获取存储数据错误:', error.message);
@@ -60,6 +72,8 @@ document.addEventListener('DOMContentLoaded', function() {
           chrome.storage.local.get(['selectedTexts'], function(result) {
             const selectedTexts = result.selectedTexts || [];
             
+            allTexts = selectedTexts;
+            
             // 如果当前记录数超过设置的最大值，则移除最早的记录
             if (selectedTexts.length > value) {
               // 按时间排序（从旧到新）
@@ -73,12 +87,16 @@ document.addEventListener('DOMContentLoaded', function() {
               // 保存更新后的记录
               try {
                 chrome.storage.local.set({ selectedTexts: trimmedTexts }, function() {
-                  // 更新显示
-                  displayTexts(trimmedTexts);
+                  allTexts = trimmedTexts;
+                  updateTotalCount(allTexts.length);
+                  performSearch();
                 });
               } catch (error) {
                 console.error('保存更新后的记录错误:', error.message);
               }
+            } else {
+              updateTotalCount(allTexts.length);
+              performSearch();
             }
           });
         } catch (error) {
@@ -90,15 +108,87 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // 搜索功能
+  searchInput.addEventListener('input', performSearch);
+  
+  // 搜索函数
+  function performSearch() {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    
+    if (searchTerm === '') {
+      filteredTexts = allTexts;
+      searchCountElement.textContent = '';
+    } else {
+      filteredTexts = allTexts.filter(item => 
+        item.text.toLowerCase().includes(searchTerm) ||
+        item.url.toLowerCase().includes(searchTerm)
+      );
+      searchCountElement.textContent = `找到 ${filteredTexts.length} 条`;
+    }
+    
+    displayTexts(filteredTexts);
+  }
+  
+  // 更新总条数显示
+  function updateTotalCount(count) {
+    totalCountElement.textContent = `${count}条`;
+    
+    // 根据记录数启用或禁用清除按钮
+    clearBtn.disabled = count === 0;
+    clearBtn.classList.toggle('disabled', count === 0);
+  }
+  
   // 清除按钮点击事件
   clearBtn.addEventListener('click', function() {
+    if (allTexts.length > 0) {
+      showConfirmModal();
+    }
+  });
+  
+  // 显示确认弹窗
+  function showConfirmModal() {
+    const modal = document.getElementById('confirm-modal');
+    modal.style.display = 'flex';
+  }
+  
+  // 关闭确认弹窗
+  function closeConfirmModal() {
+    const modal = document.getElementById('confirm-modal');
+    modal.style.display = 'none';
+  }
+  
+  // 确认清除
+  function confirmClear() {
     try {
       chrome.storage.local.set({ selectedTexts: [] }, function() {
-        selectedTextsContainer.innerHTML = '<p class="no-items">暂无复制的文本记录</p>';
+        console.log('所有记录已清除');
+        allTexts = [];
+        filteredTexts = [];
+        updateTotalCount(0);
+        searchInput.value = '';
+        searchCountElement.textContent = '';
+        displayTexts([]);
+        closeConfirmModal();
       });
     } catch (error) {
       console.error('清除记录错误:', error.message);
       selectedTextsContainer.innerHTML = '<p class="no-items">清除记录时出错</p>';
+      closeConfirmModal();
+    }
+  }
+  
+  // 获取弹窗按钮元素
+  const modalCancelBtn = document.getElementById('modal-cancel-btn');
+  const modalConfirmBtn = document.getElementById('modal-confirm-btn');
+  
+  // 绑定弹窗按钮事件
+  modalCancelBtn.addEventListener('click', closeConfirmModal);
+  modalConfirmBtn.addEventListener('click', confirmClear);
+  
+  // 点击弹窗外部关闭弹窗
+  document.getElementById('confirm-modal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeConfirmModal();
     }
   });
   
