@@ -1,4 +1,22 @@
 // 当弹出窗口加载时，显示已保存的复制文本
+function initializeOptions() {
+  // 初始化默认选项
+  chrome.storage.local.get(['options'], function(result) {
+    const options = result.options || {
+      autoSave: true,
+      showTime: true,
+      showUrl: true,
+      autoCopy: false
+    };
+    
+    // 保存默认选项
+    chrome.storage.local.set({ options: options });
+  });
+}
+
+// 初始化选项设置
+initializeOptions();
+
 document.addEventListener('DOMContentLoaded', function() {
   // 获取DOM元素
   const selectedTextsContainer = document.getElementById('selected-texts-container');
@@ -101,28 +119,89 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // 显示每条文本记录
-    sortedTexts.forEach(function(item) {
-      const textItem = document.createElement('div');
-      textItem.className = 'text-item';
-      
-      const textContent = document.createElement('div');
-      textContent.className = 'text-content';
-      textContent.textContent = item.text;
-      
-      const textMeta = document.createElement('div');
-      textMeta.className = 'text-meta';
-      
-      // 格式化时间
-      const date = new Date(item.timestamp);
-      const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-      
-      // 显示来源网址和时间，使URL可点击
-      textMeta.innerHTML = `来源: <a href="${item.url}" target="_blank">${item.url}</a><br>时间: ${formattedDate}`;
-      
-      // 添加到容器中
-      textItem.appendChild(textContent);
-      textItem.appendChild(textMeta);
-      selectedTextsContainer.appendChild(textItem);
-    });
+      sortedTexts.forEach(function(item) {
+        const textItem = document.createElement('div');
+        textItem.className = 'text-item';
+        
+        const textContent = document.createElement('div');
+        textContent.className = 'text-content';
+        textContent.textContent = item.text;
+        
+        // 添加点击展开/折叠功能
+        textContent.addEventListener('click', function() {
+          textContent.classList.toggle('expanded');
+          if (expandHint) {
+            expandHint.style.display = textContent.classList.contains('expanded') ? 'none' : 'block';
+          }
+        });
+        
+        // 创建展开提示（仅对长文本显示）
+        let expandHint = null;
+        if (item.text.length > 50) {
+          expandHint = document.createElement('div');
+          expandHint.className = 'expand-hint';
+          expandHint.textContent = '点击展开全文';
+          expandHint.addEventListener('click', function() {
+            textContent.classList.toggle('expanded');
+            expandHint.style.display = textContent.classList.contains('expanded') ? 'none' : 'block';
+          });
+        }
+        
+        const textMeta = document.createElement('div');
+        textMeta.className = 'text-meta';
+        
+        // 格式化时间
+        const date = new Date(item.timestamp);
+        const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+        
+        // 创建元信息容器
+        const metaInfo = document.createElement('div');
+        metaInfo.className = 'meta-info';
+        metaInfo.innerHTML = `来源: <a href="${item.url}" target="_blank">${item.url}</a><br>时间: ${formattedDate}`;
+        
+        // 创建复制按钮
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'copy-btn';
+        copyBtn.textContent = '复制';
+        copyBtn.addEventListener('click', function() {
+          // 复制文本到剪贴板
+          navigator.clipboard.writeText(item.text).then(function() {
+            // 临时改变按钮文字表示成功
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = '已复制';
+            setTimeout(function() {
+              copyBtn.textContent = originalText;
+            }, 1000);
+          }).catch(function(err) {
+            console.error('复制失败:', err);
+            // 备用复制方法
+            const textArea = document.createElement('textarea');
+            textArea.value = item.text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+              document.execCommand('copy');
+              const originalText = copyBtn.textContent;
+              copyBtn.textContent = '已复制';
+              setTimeout(function() {
+                copyBtn.textContent = originalText;
+              }, 1000);
+            } catch (fallbackErr) {
+              console.error('备用复制方法也失败:', fallbackErr);
+            }
+            document.body.removeChild(textArea);
+          });
+        });
+        
+        // 添加到容器中
+        textItem.appendChild(textContent);
+        if (expandHint) {
+          textItem.appendChild(expandHint);
+        }
+        textMeta.appendChild(metaInfo);
+        textMeta.appendChild(copyBtn);
+        textItem.appendChild(textMeta);
+        selectedTextsContainer.appendChild(textItem);
+      });
   }
 });

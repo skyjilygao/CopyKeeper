@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "复制宝",
-  "version": "1.0",
+  "version": "1.1",
   "description": "记录用户在网页上复制的文本",
   "permissions": ["storage"],
   "action": {

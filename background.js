@@ -3,8 +3,22 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
   // 如果是保存文本的消息（支持旧的saveSelectedText和新的saveCopiedText）
   if (message.action === 'saveSelectedText' || message.action === 'saveCopiedText') {
     try {
-      // 从存储中获取已保存的文本和最大记录数设置
-      chrome.storage.local.get(['selectedTexts', 'maxRecords'], function(result) {
+      // 从存储中获取设置和已保存的文本
+      chrome.storage.local.get(['selectedTexts', 'maxRecords', 'options'], function(result) {
+      // 获取选项设置
+      const options = result.options || {
+        autoSave: true, // 默认启用自动保存
+        showTime: true,
+        showUrl: true,
+        autoCopy: false
+      };
+      
+      // 如果未启用自动保存，则直接返回
+      if (!options.autoSave) {
+        console.log('自动保存已禁用，文本未保存');
+        return;
+      }
+      
       // 如果没有保存的文本，则创建一个空数组
       const selectedTexts = result.selectedTexts || [];
       // 获取最大记录数设置，默认为50

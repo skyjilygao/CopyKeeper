@@ -25,14 +25,55 @@
     .text-item {
       border-bottom: 1px solid #eee;
       padding: 8px 0;
+      position: relative;
     }
     .text-content {
       font-size: 14px;
       margin-bottom: 4px;
+      max-height: 40px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      cursor: pointer;
+    }
+    .text-content.expanded {
+      max-height: none;
+      -webkit-line-clamp: unset;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .text-content:hover {
+      background-color: #f9f9f9;
+      padding: 2px;
+      margin: -2px;
+    }
+    .text-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .text-content::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .text-content::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 2px;
+    }
+    .text-content::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+    .expand-hint {
+      font-size: 10px;
+      color: #999;
+      margin-top: 2px;
+      cursor: pointer;
     }
     .text-meta {
       font-size: 11px;
       color: #666;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
     .text-meta a {
       color: #1a73e8;
@@ -41,6 +82,16 @@
     }
     .text-meta a:hover {
       text-decoration: underline;
+    }
+    .meta-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .meta-info a {
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .clear-btn {
       padding: 5px 10px;
@@ -74,6 +125,23 @@
     .setting-item input[type="number"] {
       width: 60px;
       padding: 3px;
+    }
+    .copy-btn {
+      padding: 3px 8px;
+      background-color: #1a73e8;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .copy-btn:hover {
+      background-color: #1557b0;
+    }
+    .copy-btn:active {
+      background-color: #0f4999;
     }
   </style>
 </head>
